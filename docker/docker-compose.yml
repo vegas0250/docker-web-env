@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx:1.23.1-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ../www/shop:/var/www
+    links:
+      - phpfpm
+  phpfpm:
+    build: ./php
+    volumes:
+     - ../www/shop:/var/www
+  postgresql:
+    build: ./postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      #POSTGRES_DB: ${POSTGRES_DB:-shop}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data:rw
